@@ -91,7 +91,7 @@ public class ProductCommandImpl implements ProductAddService, ProductDeleteServi
     }
 
     private void validateProviderActive(Provider provider) {
-        if (provider.getStatus() != ProviderStatus.ACTIVE)
+        if (provider.getStatus() == ProviderStatus.INACTIVE)
             throw new ProductConflictException("Provider is not active");
     }
 
