@@ -36,7 +36,7 @@ public class VoucherImpl implements VoucherCreateService, VoucherGetService, Vou
 
         Voucher voucher = VoucherMapper.toEntity(req);
 
-        if (req.startAt().isAfter(Instant.now())) {
+        if (voucher.getStartAt().isAfter(Instant.now())) {
             voucher.setStatus(VoucherStatus.COMMING_SOON);
         } else {
             voucher.setStatus(VoucherStatus.ACTIVE);

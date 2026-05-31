@@ -250,8 +250,8 @@ CREATE TABLE IF NOT EXISTS tbl_vouchers
 (
     id               SERIAL PRIMARY KEY,
     code             VARCHAR(30) NOT NULL UNIQUE,
-    "discountType"   VARCHAR(20) NOT NULL,
-    "voucherType"    VARCHAR(20) NOT NULL,
+    discount_type    VARCHAR(20) NOT NULL,
+    voucher_type     VARCHAR(20) NOT NULL,
     status           VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     value            INT         NOT NULL,
     min_order_amount NUMERIC     NOT NULL DEFAULT 0,
@@ -261,8 +261,8 @@ CREATE TABLE IF NOT EXISTS tbl_vouchers
     created_at       TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT chk_voucher_discount_type CHECK ("discountType" IN ('PERCENT', 'FIXED')),
-    CONSTRAINT chk_voucher_type CHECK ("voucherType" IN ('NEWBIE', 'GLOBAL')),
+    CONSTRAINT chk_voucher_discount_type CHECK (discount_type IN ('PERCENT', 'FIXED')),
+    CONSTRAINT chk_voucher_type CHECK (voucher_type IN ('NEWBIE', 'GLOBAL')),
     CONSTRAINT chk_voucher_status CHECK (status IN ('ACTIVE', 'INACTIVE', 'COMMING_SOON'))
 );
 
