@@ -49,10 +49,12 @@ public class AdminController {
     }
 
     @PatchMapping("/{id}/delete")
-    public ResponseEntity<Void> deleteById(
+    public ResponseEntity<ApiRes<Void>> deleteById(
             @PathVariable Integer id) {
         promotionService.softDelete(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(
+                ApiRes.success("xóa thành công")
+        );
     }
 }

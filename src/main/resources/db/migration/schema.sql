@@ -1,294 +1,435 @@
--- ============================================================
--- Schema generated from JPA entities
--- Database: PostgreSQL
--- ============================================================
-
-CREATE EXTENSION IF NOT EXISTS unaccent;
-
--- =========================== AUTH ============================
-
-CREATE TABLE IF NOT EXISTS tbl_accounts
+create table tbl_accounts
 (
-    id         SERIAL PRIMARY KEY,
-    username   VARCHAR(50)  NOT NULL UNIQUE,
-    password   VARCHAR(255) NOT NULL,
-    role       VARCHAR(10)  NOT NULL DEFAULT 'CUSTOMER',
-    email      VARCHAR(100) NOT NULL UNIQUE,
-    verify     BOOLEAN      NOT NULL DEFAULT FALSE,
-    status     VARCHAR(10)  NOT NULL DEFAULT 'ACTIVE',
-    created_at TIMESTAMPTZ           DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ           DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT chk_accounts_role CHECK (role IN ('CUSTOMER', 'ADMIN', 'EMPLOYEE')),
-    CONSTRAINT chk_accounts_status CHECK (status IN ('ACTIVE', 'INACTIVE', 'BANNED'))
+    id         serial
+        primary key,
+    username   varchar(50)                                                    not null
+        unique,
+    password   varchar(255)                                                   not null,
+    role       varchar(10)              default 'CUSTOMER'::character varying not null
+        constraint chk_accounts_role
+            check ((role)::text = ANY
+                   ((ARRAY ['CUSTOMER'::character varying, 'ADMIN'::character varying, 'EMPLOYEE'::character varying])::text[])),
+    email      varchar(100)                                                   not null
+        unique
+        constraint ukoshwg9cg1y475p5ppsip091ed
+            unique,
+    verify     boolean                  default false                         not null,
+    status     varchar(10)              default 'ACTIVE'::character varying   not null
+        constraint chk_accounts_status
+            check ((status)::text = ANY
+                   ((ARRAY ['ACTIVE'::character varying, 'INACTIVE'::character varying, 'BANNED'::character varying])::text[])),
+    created_at timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone default CURRENT_TIMESTAMP
 );
 
--- =========================== USERS ===========================
+alter table tbl_accounts
+    owner to postgres;
 
-CREATE TABLE IF NOT EXISTS tbl_users
+create table tbl_users
 (
-    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    f_name     VARCHAR(255),
-    l_name     VARCHAR(255),
-    avatar     VARCHAR(255),
-    acc_id     INT,
-    created_at TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP
+    id         uuid                     default gen_random_uuid() not null
+        primary key,
+    f_name     varchar(255),
+    l_name     varchar(255),
+    avatar     varchar(255),
+    acc_id     integer,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone default CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS tbl_recivers
+alter table tbl_users
+    owner to postgres;
+
+create table tbl_recivers
 (
-    id       SERIAL PRIMARY KEY,
-    f_name   VARCHAR(100),
-    l_name   VARCHAR(100),
-    phone    VARCHAR(10)  NOT NULL,
-    country  VARCHAR(20)  NOT NULL,
-    province VARCHAR(20)  NOT NULL,
-    district VARCHAR(20)  NOT NULL,
-    street   VARCHAR(100) NOT NULL,
-    detail   VARCHAR(255),
-
-
-    user_id  UUID         NOT NULL,
-
-    CONSTRAINT fk_receiver_user FOREIGN KEY (user_id) REFERENCES tbl_users (id)
+    id       serial
+        primary key,
+    f_name   varchar(100),
+    l_name   varchar(100),
+    phone    varchar(10)  not null,
+    country  varchar(20)  not null,
+    province varchar(20)  not null,
+    district varchar(20)  not null,
+    street   varchar(100) not null,
+    detail   varchar(255),
+    user_id  uuid         not null
+        constraint fk_receiver_user
+            references tbl_users
 );
 
--- ========================= PRODUCT ===========================
+alter table tbl_recivers
+    owner to postgres;
 
-CREATE TABLE IF NOT EXISTS tbl_categories
+create table tbl_categories
 (
-    id          SERIAL PRIMARY KEY,
-    name        VARCHAR(50) NOT NULL,
-    code        VARCHAR(10) NOT NULL,
-    img_url     VARCHAR(255),
-    description VARCHAR(50),
-    status      VARCHAR(20)          DEFAULT 'ACTIVE',
-    parent_id   INT,
-    is_leaf     BOOLEAN     NOT NULL DEFAULT TRUE,
-    level       INT         NOT NULL DEFAULT 0,
-    path        VARCHAR(255),
-    version     BIGINT      NOT NULL DEFAULT 0,
-    created_at  TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_category_parent FOREIGN KEY (parent_id) REFERENCES tbl_categories (id) ON DELETE SET NULL,
-    CONSTRAINT chk_category_status CHECK (status IN ('ACTIVE', 'HIDDEN'))
+    id          serial
+        primary key,
+    name        varchar(50)                           not null,
+    code        varchar(10)                           not null,
+    img_url     varchar(255),
+    description varchar(50),
+    status      varchar(20)              default 'ACTIVE'::character varying
+        constraint chk_category_status
+            check ((status)::text = ANY ((ARRAY ['ACTIVE'::character varying, 'HIDDEN'::character varying])::text[])),
+    parent_id   integer
+        constraint fk_category_parent
+            references tbl_categories
+            on delete set null,
+    is_leaf     boolean                  default true not null,
+    level       integer                  default 0    not null,
+    path        varchar(255),
+    version     bigint                   default 0    not null,
+    created_at  timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at  timestamp with time zone default CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS tbl_providers
-(
-    id          SERIAL PRIMARY KEY,
-    name        VARCHAR(50) NOT NULL,
-    code        VARCHAR(10) NOT NULL,
-    description VARCHAR(255),
-    email       VARCHAR(100),
-    phone       VARCHAR(15),
-    status      VARCHAR(20)          DEFAULT 'ACTIVE',
-    logo        VARCHAR(255),
-    version     BIGINT      NOT NULL DEFAULT 0,
-    created_at  TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
+alter table tbl_categories
+    owner to postgres;
 
-    CONSTRAINT chk_provider_status CHECK (status IN ('ACTIVE', 'INACTIVE', 'FAMOUS'))
+create table tbl_providers
+(
+    id          serial
+        primary key,
+    name        varchar(50)                        not null,
+    code        varchar(10)                        not null,
+    description varchar(255),
+    email       varchar(100),
+    phone       varchar(15),
+    status      varchar(20)              default 'ACTIVE'::character varying
+        constraint chk_provider_status
+            check ((status)::text = ANY
+                   ((ARRAY ['ACTIVE'::character varying, 'INACTIVE'::character varying, 'FAMOUS'::character varying])::text[])),
+    logo        varchar(255),
+    version     bigint                   default 0 not null,
+    created_at  timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at  timestamp with time zone default CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS tbl_products
-(
-    id            SERIAL PRIMARY KEY,
-    name          VARCHAR(50) NOT NULL,
-    code          VARCHAR(30) NOT NULL,
-    description   VARCHAR(255),
-    quantity_sold INT                  DEFAULT 0,
-    price         NUMERIC              DEFAULT 0,
-    status        VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    rated         REAL,
-    category_id   INT,
-    provider_id   INT,
-    version       BIGINT      NOT NULL DEFAULT 0,
-    img           VARCHAR(255),
-    video         VARCHAR(255),
-    created_at    TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
+alter table tbl_providers
+    owner to postgres;
 
-    CONSTRAINT fk_product_category FOREIGN KEY (category_id) REFERENCES tbl_categories (id),
-    CONSTRAINT fk_product_provider FOREIGN KEY (provider_id) REFERENCES tbl_providers (id),
-    CONSTRAINT chk_product_status CHECK (status IN ('ACTIVE', 'ON_SALE', 'OUT_OF_STOCK', 'BESTSELLER', 'DELETED'))
+create table tbl_products
+(
+    id            serial
+        primary key,
+    name          varchar(50)                                                  not null,
+    code          varchar(30)                                                  not null,
+    description   varchar(255),
+    quantity_sold integer                  default 0,
+    price         numeric(38, 2)           default 0,
+    status        varchar(20)              default 'ACTIVE'::character varying not null
+        constraint chk_product_status
+            check ((status)::text = ANY
+                   ((ARRAY ['ACTIVE'::character varying, 'ON_SALE'::character varying, 'OUT_OF_STOCK'::character varying, 'BESTSELLER'::character varying, 'DELETED'::character varying])::text[])),
+    rated         real,
+    category_id   integer
+        constraint fk_product_category
+            references tbl_categories,
+    provider_id   integer
+        constraint fk_product_provider
+            references tbl_providers,
+    version       bigint                   default 0                           not null,
+    img           varchar(255),
+    video         varchar(255),
+    created_at    timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at    timestamp with time zone default CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS tbl_sizes
+alter table tbl_products
+    owner to postgres;
+
+create table tbl_sizes
 (
-    id         SERIAL PRIMARY KEY,
-    size       VARCHAR(255),
-    weight     DOUBLE PRECISION,
-    height     DOUBLE PRECISION,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    id         serial
+        primary key,
+    size       varchar(255),
+    weight     double precision,
+    height     double precision,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone default CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS tbl_items
-(
-    product_id INT NOT NULL,
-    size_id    INT NOT NULL,
-    quantity   INT NOT NULL DEFAULT 0,
-    status     VARCHAR(255),
+alter table tbl_sizes
+    owner to postgres;
 
-    PRIMARY KEY (product_id, size_id),
-    CONSTRAINT fk_item_product FOREIGN KEY (product_id) REFERENCES tbl_products (id) ON DELETE CASCADE,
-    CONSTRAINT fk_item_size FOREIGN KEY (size_id) REFERENCES tbl_sizes (id) ON DELETE CASCADE,
-    CONSTRAINT chk_item_status CHECK (status IN ('AVAILABLE', 'OUT_OF_STOCK', 'DISCONTINUED'))
+create table tbl_items
+(
+    product_id integer           not null
+        constraint fk_item_product
+            references tbl_products
+            on delete cascade,
+    size_id    integer           not null
+        constraint fk_item_size
+            references tbl_sizes
+            on delete cascade,
+    quantity   integer default 0 not null,
+    status     varchar(255)
+        constraint chk_item_status
+            check ((status)::text = ANY
+                   ((ARRAY ['AVAILABLE'::character varying, 'OUT_OF_STOCK'::character varying, 'DISCONTINUED'::character varying])::text[])),
+    primary key (product_id, size_id)
 );
 
-CREATE TABLE IF NOT EXISTS tbl_comments
-(
-    product_id INT  NOT NULL,
-    user_id    UUID NOT NULL,
-    content    TEXT NOT NULL,
-    rating     REAL,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+alter table tbl_items
+    owner to postgres;
 
-    PRIMARY KEY (product_id, user_id),
-    CONSTRAINT fk_comment_product FOREIGN KEY (product_id) REFERENCES tbl_products (id)
+create table tbl_comments
+(
+    product_id integer not null
+        constraint fk_comment_product
+            references tbl_products,
+    user_id    uuid    not null,
+    content    text    not null,
+    rating     real,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone default CURRENT_TIMESTAMP,
+    primary key (product_id, user_id)
 );
 
--- =========================== CART ============================
+alter table tbl_comments
+    owner to postgres;
 
-CREATE TABLE IF NOT EXISTS tbl_cart_items
+create table tbl_cart_items
 (
-    user_id    UUID NOT NULL,
-    product_id INT  NOT NULL,
-    size_id    INT  NOT NULL,
-    quantity   INT  NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (user_id, product_id, size_id),
-    CONSTRAINT fk_cart_user FOREIGN KEY (user_id) REFERENCES tbl_users (id),
-    CONSTRAINT fk_cart_product FOREIGN KEY (product_id) REFERENCES tbl_products (id),
-    CONSTRAINT fk_cart_size FOREIGN KEY (size_id) REFERENCES tbl_sizes (id)
+    user_id    uuid    not null
+        constraint fk_cart_user
+            references tbl_users,
+    product_id integer not null
+        constraint fk_cart_product
+            references tbl_products,
+    size_id    integer not null
+        constraint fk_cart_size
+            references tbl_sizes,
+    quantity   integer not null,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone default CURRENT_TIMESTAMP,
+    primary key (user_id, product_id, size_id)
 );
 
--- ========================== ORDER ============================
+alter table tbl_cart_items
+    owner to postgres;
 
-CREATE TABLE IF NOT EXISTS tbl_orders
+create table tbl_orders
 (
-    id               SERIAL PRIMARY KEY,
-    code             VARCHAR(20) NOT NULL UNIQUE,
-    status           VARCHAR(20) NOT NULL DEFAULT 'PENDING',
-    voucher_code     VARCHAR(30),
-    total_price      NUMERIC     NOT NULL,
-    voucher_discount NUMERIC,
-    final_price      NUMERIC     NOT NULL,
-    note             VARCHAR(500),
-    payment_type     VARCHAR(30),
-    version          BIGINT      NOT NULL DEFAULT 0,
-    user_id          UUID        NOT NULL,
-    receiver_id      INT         NOT NULL,
-    created_at       TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
-    updated_at       TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT chk_order_status CHECK (status IN
-                                       ('UNPAID', 'PAID', 'PENDING', 'CONFIRMED',
-                                        'SHIPPING', 'DELIVERED', 'COMPLETED', 'CANCELLED', 'RETURNED')),
-    CONSTRAINT chk_order_payment_type CHECK (payment_type IN
-                                             ('PAYMENT_UPON_DELIVER', 'ONLINE'))
+    id               serial
+        primary key,
+    code             varchar(20)                                                   not null
+        unique,
+    status           varchar(20)              default 'PENDING'::character varying not null
+        constraint chk_order_status
+            check ((status)::text = ANY
+                   ((ARRAY ['UNPAID'::character varying, 'PAID'::character varying, 'PENDING'::character varying, 'CONFIRMED'::character varying, 'SHIPPING'::character varying, 'DELIVERED'::character varying, 'COMPLETED'::character varying, 'CANCELLED'::character varying, 'RETURNED'::character varying])::text[])),
+    voucher_code     varchar(30),
+    total_price      numeric(38, 2)                                                not null,
+    voucher_discount numeric(38, 2),
+    final_price      numeric(38, 2)                                                not null,
+    note             varchar(500),
+    version          bigint                   default 0                            not null,
+    user_id          uuid                                                          not null,
+    receiver_id      integer                                                       not null,
+    created_at       timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at       timestamp with time zone default CURRENT_TIMESTAMP,
+    payment_type     varchar(255)
+        constraint tbl_orders_payment_type_check
+            check ((payment_type)::text = ANY
+                   ((ARRAY ['PAYMENT_UPON_DELIVER'::character varying, 'ONLINE'::character varying])::text[]))
 );
 
-CREATE TABLE IF NOT EXISTS tbl_order_items
-(
-    order_id    INT     NOT NULL,
-    product_id  INT     NOT NULL,
-    size_id     INT     NOT NULL,
-    quantity    INT     NOT NULL,
-    original_price NUMERIC NOT NULL,
-    final_price    NUMERIC NOT NULL,
-    total_price NUMERIC NOT NULL,
+alter table tbl_orders
+    owner to postgres;
 
-    PRIMARY KEY (order_id, product_id, size_id),
-    CONSTRAINT fk_oi_order FOREIGN KEY (order_id) REFERENCES tbl_orders (id)
+create table tbl_order_items
+(
+    order_id       integer        not null
+        constraint fk_oi_order
+            references tbl_orders
+            on delete cascade,
+    product_id     integer        not null,
+    size_id        integer        not null,
+    quantity       integer        not null,
+    total_price    numeric(38, 2) not null,
+    final_price    numeric(38, 2) not null,
+    original_price numeric(38, 2) not null,
+    primary key (order_id, product_id, size_id)
 );
 
--- ======================== PROMOTION ==========================
+alter table tbl_order_items
+    owner to postgres;
 
-CREATE TABLE IF NOT EXISTS tbl_promotions
+create table tbl_promotions
 (
-    id       SERIAL PRIMARY KEY,
-    value    INT         NOT NULL,
-    start_at TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
-    end_at   TIMESTAMPTZ,
-    priority INT                  DEFAULT 1,
-    status   VARCHAR(20)          DEFAULT 'SCHEDULED',
-    scope    VARCHAR(20) NOT NULL DEFAULT 'GLOBAL',
-    version  BIGINT      NOT NULL DEFAULT 0,
-
-    CONSTRAINT chk_promo_status CHECK (status IN ('SCHEDULED', 'ACTIVE', 'ENDED', 'DELETED')),
-    CONSTRAINT chk_promo_scope CHECK (scope IN ('GLOBAL', 'PRODUCT', 'CATEGORY', 'PROVIDER'))
+    id       serial
+        primary key,
+    value    integer                                                      not null,
+    start_at timestamp with time zone default CURRENT_TIMESTAMP,
+    end_at   timestamp with time zone,
+    priority integer                  default 1,
+    status   varchar(20)              default 'SCHEDULED'::character varying
+        constraint chk_promo_status
+            check ((status)::text = ANY
+                   ((ARRAY ['SCHEDULED'::character varying, 'ACTIVE'::character varying, 'ENDED'::character varying, 'DELETED'::character varying])::text[])),
+    scope    varchar(20)              default 'GLOBAL'::character varying not null
+        constraint chk_promo_scope
+            check ((scope)::text = ANY
+                   ((ARRAY ['GLOBAL'::character varying, 'PRODUCT'::character varying, 'CATEGORY'::character varying, 'PROVIDER'::character varying])::text[])),
+    version  bigint                   default 0                           not null
 );
 
-CREATE TABLE IF NOT EXISTS tbl_promotion_category
-(
-    category_id  INT NOT NULL,
-    promotion_id INT NOT NULL,
+alter table tbl_promotions
+    owner to postgres;
 
-    PRIMARY KEY (category_id, promotion_id),
-    CONSTRAINT fk_pc_promotion FOREIGN KEY (promotion_id) REFERENCES tbl_promotions (id) ON DELETE CASCADE
+create table tbl_promotion_category
+(
+    category_id  integer not null,
+    promotion_id integer not null
+        constraint fk_pc_promotion
+            references tbl_promotions
+            on delete cascade,
+    primary key (category_id, promotion_id)
 );
 
-CREATE TABLE IF NOT EXISTS tbl_promotion_product
-(
-    product_id   INT NOT NULL,
-    promotion_id INT NOT NULL,
+alter table tbl_promotion_category
+    owner to postgres;
 
-    PRIMARY KEY (product_id, promotion_id),
-    CONSTRAINT fk_pp_promotion FOREIGN KEY (promotion_id) REFERENCES tbl_promotions (id)
+create table tbl_promotion_product
+(
+    product_id   integer not null,
+    promotion_id integer not null
+        constraint fk_pp_promotion
+            references tbl_promotions,
+    primary key (product_id, promotion_id)
 );
 
--- ========================= VOUCHER ===========================
+alter table tbl_promotion_product
+    owner to postgres;
 
-CREATE TABLE IF NOT EXISTS tbl_vouchers
+create table tbl_vouchers
 (
-    id               SERIAL PRIMARY KEY,
-    code             VARCHAR(30) NOT NULL UNIQUE,
-    discount_type    VARCHAR(20) NOT NULL,
-    voucher_type     VARCHAR(20) NOT NULL,
-    status           VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    value            INT         NOT NULL,
-    min_order_amount NUMERIC     NOT NULL DEFAULT 0,
-    start_at         TIMESTAMPTZ,
-    end_at           TIMESTAMPTZ,
-    version          BIGINT      NOT NULL DEFAULT 0,
-    created_at       TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
-    updated_at       TIMESTAMPTZ          DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT chk_voucher_discount_type CHECK (discount_type IN ('PERCENT', 'FIXED')),
-    CONSTRAINT chk_voucher_type CHECK (voucher_type IN ('NEWBIE', 'GLOBAL')),
-    CONSTRAINT chk_voucher_status CHECK (status IN ('ACTIVE', 'INACTIVE', 'COMMING_SOON'))
+    id               serial
+        primary key,
+    code             varchar(30)                                                  not null
+        unique,
+    status           varchar(20)              default 'ACTIVE'::character varying not null
+        constraint chk_voucher_status
+            check ((status)::text = ANY
+                   ((ARRAY ['ACTIVE'::character varying, 'INACTIVE'::character varying, 'COMMING_SOON'::character varying])::text[])),
+    value            integer                                                      not null,
+    min_order_amount numeric(38, 2)           default 0                           not null,
+    start_at         timestamp with time zone,
+    end_at           timestamp with time zone,
+    version          bigint                   default 0                           not null,
+    created_at       timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at       timestamp with time zone default CURRENT_TIMESTAMP,
+    discount_type    varchar(20)                                                  not null
+        constraint tbl_vouchers_discount_type_check
+            check ((discount_type)::text = ANY
+                   ((ARRAY ['PERCENT'::character varying, 'FIXED'::character varying])::text[]))
+        constraint chk_voucher_discount_type
+            check ((discount_type)::text = ANY
+                   ((ARRAY ['PERCENT'::character varying, 'FIXED'::character varying])::text[])),
+    voucher_type     varchar(20)                                                  not null
+        constraint tbl_vouchers_voucher_type_check
+            check ((voucher_type)::text = ANY
+                   ((ARRAY ['NEWBIE'::character varying, 'GLOBAL'::character varying])::text[]))
+        constraint chk_voucher_type
+            check ((voucher_type)::text = ANY
+                   ((ARRAY ['NEWBIE'::character varying, 'GLOBAL'::character varying])::text[]))
 );
 
-CREATE TABLE IF NOT EXISTS tbl_user_vouchers
-(
-    voucher_id      INT         NOT NULL,
-    user_id         UUID        NOT NULL,
-    status          VARCHAR(20) NOT NULL DEFAULT 'AVAILABLE',
-    end_at          TIMESTAMPTZ,
-    min_price_apply NUMERIC,
-    version         BIGINT      NOT NULL DEFAULT 0,
+alter table tbl_vouchers
+    owner to postgres;
 
-    PRIMARY KEY (voucher_id, user_id),
-    CONSTRAINT uk_user_voucher UNIQUE (user_id, voucher_id),
-    CONSTRAINT fk_uv_voucher FOREIGN KEY (voucher_id) REFERENCES tbl_vouchers (id),
-    CONSTRAINT chk_uv_status CHECK (status IN ('AVAILABLE', 'USED', 'EXPIRED'))
+create table tbl_user_vouchers
+(
+    voucher_id      integer                                            not null
+        constraint fk_uv_voucher
+            references tbl_vouchers,
+    user_id         uuid                                               not null,
+    status          varchar(20) default 'AVAILABLE'::character varying not null
+        constraint chk_uv_status
+            check ((status)::text = ANY
+                   ((ARRAY ['AVAILABLE'::character varying, 'USED'::character varying, 'EXPIRED'::character varying])::text[])),
+    end_at          timestamp with time zone,
+    min_price_apply numeric(38, 2),
+    version         bigint      default 0                              not null,
+    primary key (voucher_id, user_id),
+    constraint uk_user_voucher
+        unique (user_id, voucher_id)
 );
 
--- ======================= Notification ====================
-create table if not exists tbl_notifications
+alter table tbl_user_vouchers
+    owner to postgres;
+
+create table tbl_notifications
 (
-    id          serial primary key,
-    code        varchar(30) unique,
+    id          serial
+        primary key,
+    code        varchar(30)
+        unique,
     sender_id   uuid,
     receiver_id uuid,
-    type        varchar(20) not null,
+    type        varchar(20)           not null,
     title       varchar(100),
-    message     text
-)
+    message     text,
+    created_at  timestamp(6) with time zone,
+    updated_at  timestamp(6) with time zone,
+    for_admin   boolean default true  not null,
+    is_delete   boolean default false not null,
+    readed      boolean default false not null
+);
+
+alter table tbl_notifications
+    owner to postgres;
+
+create function unaccent(regdictionary, text) returns text
+    stable
+    strict
+    parallel safe
+    language c
+as
+$$
+begin
+-- missing source code
+end;
+$$;
+
+alter function unaccent(regdictionary, text) owner to supabase_admin;
+
+create function unaccent(text) returns text
+    stable
+    strict
+    parallel safe
+    language c
+as
+$$
+begin
+-- missing source code
+end;
+$$;
+
+alter function unaccent(text) owner to supabase_admin;
+
+create function unaccent_init(internal) returns internal
+    parallel safe
+    language c
+as
+$$
+begin
+-- missing source code
+end;
+$$;
+
+alter function unaccent_init(internal) owner to supabase_admin;
+
+create function unaccent_lexize(internal, internal, internal, internal) returns internal
+    parallel safe
+    language c
+as
+$$
+begin
+-- missing source code
+end;
+$$;
+
+alter function unaccent_lexize(internal, internal, internal, internal) owner to supabase_admin;
+
