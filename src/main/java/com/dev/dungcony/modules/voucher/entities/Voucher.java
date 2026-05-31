@@ -37,11 +37,11 @@ public class Voucher extends BaseEntity {
     private String code;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "discountType", nullable = false, length = 20)
+    @Column(name = "discount_type", nullable = false, length = 20)
     private DiscountType discountType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "voucherType", nullable = false, length = 20)
+    @Column(name = "voucher_type", nullable = false, length = 20)
     private VoucherType voucherType;
 
     @Enumerated(EnumType.STRING)
