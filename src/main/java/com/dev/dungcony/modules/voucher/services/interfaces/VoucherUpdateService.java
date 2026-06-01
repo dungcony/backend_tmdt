@@ -1,7 +1,7 @@
 package com.dev.dungcony.modules.voucher.services.interfaces;
 
-import com.dev.dungcony.modules.voucher.dtos.req.VoucherUpdateReq;
-import com.dev.dungcony.modules.voucher.dtos.res.VoucherRes;
+import com.dev.dungcony.modules.voucher.dto.req.VoucherUpdateReq;
+import com.dev.dungcony.modules.voucher.dto.res.VoucherRes;
 
 import java.time.Instant;
 

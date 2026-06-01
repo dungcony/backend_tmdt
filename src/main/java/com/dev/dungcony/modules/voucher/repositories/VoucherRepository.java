@@ -21,17 +21,17 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
     @Query("""
             UPDATE Voucher v
             SET v.status = CASE
-                WHEN v.endAt <= :now THEN :inactiveStatus
-                WHEN v.startAt <= :now THEN :activeStatus
+                WHEN v.endAt IS NOT NULL AND v.endAt <= :now THEN :inactiveStatus
+                WHEN v.startAt > :now THEN :commingSoonStatus
+                ELSE :activeStatus
             END
-            WHERE v.status NOT IN :listNotIn
-                 AND (v.endAt <= :now OR v.startAt <= :now)
             """)
     int checkOrUpdate(
-            @Param("activeStatus") VoucherStatus activeStatus,
+            @Param("now") Instant now,
             @Param("inactiveStatus") VoucherStatus inactiveStatus,
-            @Param("listNotIn") List<VoucherStatus> notIn,
-            @Param("now") Instant now);
+            @Param("commingSoonStatus") VoucherStatus commingSoonStatus,
+            @Param("activeStatus") VoucherStatus activeStatus
+    );
 
     boolean existsByCode(String code);
 

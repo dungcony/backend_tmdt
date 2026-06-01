@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.dev.dungcony.modules.product.entities.Category;
+import com.dev.dungcony.modules.product.enums.CategoryStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,15 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
                 )
             """)
     List<Category> findAllChildrenByCode(String code);
+
+    @Query("""
+                SELECT c
+                FROM Category c
+                WHERE c.isLeaf = true
+                AND c.status = :status
+                ORDER BY c.level ASC, c.name ASC
+            """)
+    List<Category> findAllLeafByStatus(@Param("status") CategoryStatus status);
 
     @Query("""
                 SELECT c

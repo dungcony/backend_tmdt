@@ -1,12 +1,12 @@
 package com.dev.dungcony.modules.users.mappers;
 
-import com.dev.dungcony.modules.users.dtos.AddressDto;
+import com.dev.dungcony.modules.users.dto.res.AddressRes;
 import com.dev.dungcony.modules.users.entities.Address;
 
-public class AddressMapper {
+public final class AddressMapper {
 
-    public static AddressDto toDto(Address address) {
-        return new AddressDto(
+    public static AddressRes toDto(Address address) {
+        return new AddressRes(
                 address.getCountry(),
                 address.getProvince(),
                 address.getDistrict(),
@@ -14,7 +14,7 @@ public class AddressMapper {
                 address.getDetail());
     }
 
-    public static Address toEntity(AddressDto dto) {
+    public static Address toEntity(AddressRes dto) {
         Address address = new Address();
         address.setCountry(dto.country());
         address.setProvince(dto.province());

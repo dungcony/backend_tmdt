@@ -17,7 +17,6 @@ import com.dev.dungcony.modules.product.entities.Size;
 import com.dev.dungcony.modules.product.enums.ProductSize;
 import com.dev.dungcony.modules.product.enums.ProductStatus;
 import com.dev.dungcony.modules.product.services.interfaces.SizeCacheService;
-import com.dev.dungcony.modules.product.services.interfaces.item.ItemUpdateService;
 import com.dev.dungcony.modules.product.services.interfaces.product.ProductGetService;
 import com.dev.dungcony.modules.users.entities.User;
 import jakarta.persistence.EntityManager;
@@ -38,7 +37,6 @@ public class CartUpdateImpl implements CartUpdateService {
     private final CartRepository cartItemRepository;
     private final SizeCacheService sizeCacheService;
     private final ProductGetService productGetService;
-    private final ItemUpdateService itemUpdateService;
     private final EntityManager entityManager;
 
     @Override
@@ -129,7 +127,6 @@ public class CartUpdateImpl implements CartUpdateService {
                 item.setQuantity(remainingQuantity);
                 cartItemRepository.save(item);
             }
-            itemUpdateService.reduce(cartItemDto.productId(), sizeId, cartItemDto.quantity());
         }
     }
 

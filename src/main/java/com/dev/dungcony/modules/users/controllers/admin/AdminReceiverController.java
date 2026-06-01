@@ -2,9 +2,9 @@ package com.dev.dungcony.modules.users.controllers.admin;
 
 import com.dev.dungcony.commons.dtos.ApiRes;
 import com.dev.dungcony.commons.dtos.PageRes;
-import com.dev.dungcony.modules.users.dtos.res.ReceiverRes;
-import com.dev.dungcony.modules.users.services.interfaces.RecieverGetService;
-import com.dev.dungcony.modules.users.services.interfaces.ReceiverRemoveService;
+import com.dev.dungcony.modules.users.dto.res.ReceiverRes;
+import com.dev.dungcony.modules.users.services.interfaces.receivers.RecieverGetService;
+import com.dev.dungcony.modules.users.services.interfaces.receivers.ReceiverRemoveService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

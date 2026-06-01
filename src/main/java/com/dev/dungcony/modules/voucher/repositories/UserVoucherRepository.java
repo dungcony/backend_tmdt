@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -49,5 +50,50 @@ public interface UserVoucherRepository extends JpaRepository<UserVoucher, UserVo
     int checkOrUpdate(
             @Param("not_check") List<UserVoucherStatus> notChecks,
             @Param("now") Instant now);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            INSERT INTO tbl_user_vouchers (voucher_id, user_id, status, end_at, min_price_apply, version)
+            SELECT :voucherId, u.id, 'AVAILABLE', :endAt, :minPriceApply, 0
+            FROM tbl_users u
+            ON CONFLICT (voucher_id, user_id) DO NOTHING
+            """, nativeQuery = true)
+    int grantGlobalVoucher(
+            @Param("voucherId") Integer voucherId,
+            @Param("endAt") Instant endAt,
+            @Param("minPriceApply") BigDecimal minPriceApply);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            INSERT INTO tbl_user_vouchers (voucher_id, user_id, status, end_at, min_price_apply, version)
+            SELECT :voucherId, u.id, 'AVAILABLE', :endAt, :minPriceApply, 0
+            FROM tbl_users u
+            WHERE u.created_at > :createdAfter
+            ON CONFLICT (voucher_id, user_id) DO NOTHING
+            """, nativeQuery = true)
+    int grantNewbieVoucher(
+            @Param("voucherId") Integer voucherId,
+            @Param("endAt") Instant endAt,
+            @Param("minPriceApply") BigDecimal minPriceApply,
+            @Param("createdAfter") Instant createdAfter);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            INSERT INTO tbl_user_vouchers (voucher_id, user_id, status, end_at, min_price_apply, version)
+            SELECT :voucherId, u.id, 'AVAILABLE', :endAt, :minPriceApply, 0
+            FROM tbl_users u
+            JOIN tbl_ranks user_rank ON user_rank.id = u.rank_id
+            JOIN tbl_ranks required_rank ON required_rank.id = :rankId
+            WHERE user_rank.level >= required_rank.level
+            ON CONFLICT (voucher_id, user_id) DO NOTHING
+            """, nativeQuery = true)
+    int grantRankVoucher(
+            @Param("voucherId") Integer voucherId,
+            @Param("rankId") Integer rankId,
+            @Param("endAt") Instant endAt,
+            @Param("minPriceApply") BigDecimal minPriceApply);
 
 }

@@ -98,6 +98,7 @@ public class ApiRequestLogFilter extends OncePerRequestFilter {
 
         // ==================== PUBLIC — CATEGORY ====================
         exact("GET /v1/api/public/category/get-all", "Lấy toàn bộ danh mục");
+        exact("GET /v1/api/public/category/get-all-leaf", "Lấy toàn bộ danh mục leaf đang active");
         prefix("GET /v1/api/public/category/get-children/", "Lấy danh mục con");
         prefix("GET /v1/api/public/category/get/", "Lấy thông tin danh mục");
 
@@ -156,6 +157,9 @@ public class ApiRequestLogFilter extends OncePerRequestFilter {
         exact("GET /v1/api/admin/order/get-by-status", "[ADMIN] Lấy đơn hàng theo trạng thái");
         exact("PATCH /v1/api/admin/order/update-status", "[ADMIN] Cập nhật trạng thái đơn hàng");
         prefix("GET /v1/api/admin/order/", "[ADMIN] Xem chi tiết đơn hàng");
+
+        // ==================== ADMIN - UPLOAD ====================
+        exact("POST /v1/api/admin/upload/image", "[ADMIN] Upload image");
 
         // ==================== ADMIN — VOUCHER ====================
         exact("POST /v1/api/admin/voucher/create", "[ADMIN] Tạo voucher mới");

@@ -7,7 +7,7 @@ import com.dev.dungcony.modules.order.dtos.res.OrderRes;
 import com.dev.dungcony.modules.order.entities.Order;
 import com.dev.dungcony.modules.order.enums.OrderStatus;
 import com.dev.dungcony.modules.order.enums.PaymentType;
-import com.dev.dungcony.modules.users.dtos.res.ReceiverRes;
+import com.dev.dungcony.modules.users.dto.res.ReceiverRes;
 
 import java.util.List;
 import java.util.UUID;

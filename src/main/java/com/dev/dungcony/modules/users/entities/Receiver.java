@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "tbl_recivers")
+@Table(name = "tbl_receivers")
 public class Receiver {
 
     @Id

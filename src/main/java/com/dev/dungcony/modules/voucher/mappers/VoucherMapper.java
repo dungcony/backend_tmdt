@@ -1,27 +1,13 @@
 package com.dev.dungcony.modules.voucher.mappers;
 
-import com.dev.dungcony.modules.voucher.dtos.VoucherDto;
-import com.dev.dungcony.modules.voucher.dtos.req.CreateVoucherReq;
-import com.dev.dungcony.modules.voucher.dtos.res.VoucherRes;
+import com.dev.dungcony.modules.voucher.dto.req.CreateVoucherReq;
+import com.dev.dungcony.modules.voucher.dto.req.VoucherUpdateReq;
+import com.dev.dungcony.modules.voucher.dto.res.VoucherRes;
 import com.dev.dungcony.modules.voucher.entities.Voucher;
 
 import java.time.Instant;
 
 public class VoucherMapper {
-
-    public static VoucherDto toDto(Voucher voucher) {
-        return new VoucherDto(
-                voucher.getId(),
-                voucher.getCode(),
-                voucher.getDiscountType(),
-                voucher.getVoucherType(),
-                voucher.getStatus(),
-                voucher.getValue(),
-                voucher.getMinOrderAmount(),
-                voucher.getStartAt(),
-                voucher.getEndAt()
-        );
-    }
 
     public static VoucherRes toRes(Voucher voucher) {
         return new VoucherRes(
@@ -48,4 +34,5 @@ public class VoucherMapper {
         voucher.setEndAt(req.endAt());
         return voucher;
     }
+    
 }

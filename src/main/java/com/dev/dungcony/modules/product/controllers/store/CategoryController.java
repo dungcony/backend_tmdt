@@ -31,6 +31,15 @@ public class CategoryController {
                                                 service.getAll()));
         }
 
+        @Operation(summary = "get all leaf categories", description = "Return active leaf categories for product creation")
+        @GetMapping("/get-all-leaf")
+        public ResponseEntity<ApiRes<?>> getAllLeaf() {
+                return ResponseEntity.ok()
+                                .body(ApiRes.success(
+                                                "list leaf category",
+                                                service.getAllLeaf()));
+        }
+
         @Operation(summary = "lấy danh sách danh mục con", description = "Phân trang, hỗ trợ sort: ?page=0&size=10&sort=price,asc")
         @GetMapping("/get-children/{code}")
         public ResponseEntity<ApiRes<?>> getAllChildren(

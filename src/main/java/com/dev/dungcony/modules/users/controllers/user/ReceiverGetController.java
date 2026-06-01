@@ -2,8 +2,8 @@ package com.dev.dungcony.modules.users.controllers.user;
 
 import com.dev.dungcony.commons.dtos.AccountDetails;
 import com.dev.dungcony.commons.dtos.ApiRes;
-import com.dev.dungcony.modules.users.dtos.res.ReceiverRes;
-import com.dev.dungcony.modules.users.services.interfaces.RecieverGetService;
+import com.dev.dungcony.modules.users.dto.res.ReceiverRes;
+import com.dev.dungcony.modules.users.services.interfaces.receivers.RecieverGetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

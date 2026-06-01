@@ -24,7 +24,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Payments")
+@Tag(name = "Payment")
 public class PaymentController {
 
     private final PayOsService payOsService;

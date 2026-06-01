@@ -78,10 +78,10 @@ public class CommentCreateImpl implements CommentCreateService {
         boolean purchased = orderItemRepository.existsByUserIdAndProductIdAndOrderStatus(
                 userId,
                 productId,
-                OrderStatus.DELIVERED);
+                OrderStatus.COMPLETED);
 
         if (!purchased) {
-            throw new CommentForbiddenException("Chỉ được bình luận sản phẩm đã mua và giao thành công");
+            throw new CommentForbiddenException("Chỉ được bình luận sản phẩm đã nhận thành công");
         }
     }
 
@@ -93,7 +93,7 @@ public class CommentCreateImpl implements CommentCreateService {
         product.setRated(averageRating == null
                 ? null
                 : BigDecimal.valueOf(averageRating)
-                        .setScale(1, RoundingMode.HALF_UP)
-                        .floatValue());
+                .setScale(1, RoundingMode.HALF_UP)
+                .floatValue());
     }
 }

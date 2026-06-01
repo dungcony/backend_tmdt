@@ -2,10 +2,10 @@ package com.dev.dungcony.modules.users.controllers.admin;
 
 import com.dev.dungcony.commons.dtos.ApiRes;
 import com.dev.dungcony.commons.dtos.PageRes;
-import com.dev.dungcony.modules.users.dtos.req.UserUpdateReq;
-import com.dev.dungcony.modules.users.dtos.res.UserRes;
-import com.dev.dungcony.modules.users.services.interfaces.UserGetService;
-import com.dev.dungcony.modules.users.services.interfaces.UserUpdateService;
+import com.dev.dungcony.modules.users.dto.req.UserUpdateReq;
+import com.dev.dungcony.modules.users.dto.res.UserRes;
+import com.dev.dungcony.modules.users.services.interfaces.users.UserGetService;
+import com.dev.dungcony.modules.users.services.interfaces.users.UserUpdateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

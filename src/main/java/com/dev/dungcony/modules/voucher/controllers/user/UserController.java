@@ -2,7 +2,7 @@ package com.dev.dungcony.modules.voucher.controllers.user;
 
 import com.dev.dungcony.commons.dtos.AccountDetails;
 import com.dev.dungcony.commons.dtos.ApiRes;
-import com.dev.dungcony.modules.voucher.dtos.res.UserVoucherRes;
+import com.dev.dungcony.modules.voucher.dto.res.UserVoucherRes;
 import com.dev.dungcony.modules.voucher.enums.UserVoucherStatus;
 import com.dev.dungcony.modules.voucher.services.interfaces.UserVoucherGetService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/api/user/vouchers")
-@Tag(name = "Voucher")
+@Tag(name = "Vouchers")
 public class UserController {
 
     private final UserVoucherGetService userVoucherGetService;

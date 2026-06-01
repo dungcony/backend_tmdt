@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.dungcony.commons.dtos.AccountDetails;
 import com.dev.dungcony.commons.dtos.ApiRes;
-import com.dev.dungcony.modules.users.dtos.res.UserRes;
-import com.dev.dungcony.modules.users.dtos.req.UserUpdateReq;
-import com.dev.dungcony.modules.users.services.interfaces.UserUpdateService;
+import com.dev.dungcony.modules.users.dto.res.UserRes;
+import com.dev.dungcony.modules.users.dto.req.UserUpdateReq;
+import com.dev.dungcony.modules.users.services.interfaces.users.UserUpdateService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

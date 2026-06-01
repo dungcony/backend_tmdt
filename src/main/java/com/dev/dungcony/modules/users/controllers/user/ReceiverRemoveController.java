@@ -2,7 +2,7 @@ package com.dev.dungcony.modules.users.controllers.user;
 
 import com.dev.dungcony.commons.dtos.AccountDetails;
 import com.dev.dungcony.commons.dtos.ApiRes;
-import com.dev.dungcony.modules.users.services.interfaces.ReceiverRemoveService;
+import com.dev.dungcony.modules.users.services.interfaces.receivers.ReceiverRemoveService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

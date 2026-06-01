@@ -1,6 +1,6 @@
 package com.dev.dungcony.modules.voucher.services.interfaces;
 
-import com.dev.dungcony.modules.voucher.dtos.res.UserVoucherRes;
+import com.dev.dungcony.modules.voucher.dto.res.UserVoucherRes;
 import com.dev.dungcony.modules.voucher.enums.UserVoucherStatus;
 
 import java.math.BigDecimal;

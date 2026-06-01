@@ -10,6 +10,7 @@ import com.dev.dungcony.modules.order.exceptions.OrderNotFoundException;
 import com.dev.dungcony.modules.order.repositories.OrderRepository;
 import com.dev.dungcony.modules.order.services.interfaces.OrderUpdateService;
 import com.dev.dungcony.modules.product.services.interfaces.item.ItemUpdateService;
+import com.dev.dungcony.modules.users.services.interfaces.users.UserUpdateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class OrderUpdateImpl implements OrderUpdateService {
 
     private final OrderRepository orderRepository;
+    private final UserUpdateService userUpdateService;
     private final ItemUpdateService itemUpdateService;
     private final NotificationCreateService notificationCreateService;
 
@@ -36,9 +38,11 @@ public class OrderUpdateImpl implements OrderUpdateService {
         if (!order.getUserId().equals(userId))
             throw new OrderUnAuthException();
 
-        if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.UNPAID) {
+        OrderStatus oldStatus = order.getStatus();
+
+        if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.UNPAID)
             throw new OrderConflictException("trạng thái hiện tại của đơn hàng không thể hủy");
-        }
+
         order.setStatus(OrderStatus.CANCELLED);
 
         // trả lại số lượng đơn hàng
@@ -51,7 +55,12 @@ public class OrderUpdateImpl implements OrderUpdateService {
         }
 
         log.info("Order cancelled: {} by user: {}", orderCode, userId);
+
+        if (oldStatus == OrderStatus.PENDING)
+            userUpdateService.reducePurchaseAndUpdateRank(userId, order.getFinalPrice());
+
         notificationCreateService.userCancelOrder(userId);
+
     }
 
     @Transactional
@@ -70,6 +79,8 @@ public class OrderUpdateImpl implements OrderUpdateService {
         order.setStatus(OrderStatus.PENDING);
         notificationCreateService.userPailOrder(userId);
 
+        userUpdateService.increasePurchaseAndUpdateRank(userId, order.getFinalPrice());
+
         log.info("thanh toán thành công");
     }
 
@@ -82,8 +93,8 @@ public class OrderUpdateImpl implements OrderUpdateService {
         if (!order.getUserId().equals(userId))
             throw new OrderUnAuthException();
 
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new OrderConflictException("chỉ đơn hàng đang chờ xác nhận");
+        if (order.getStatus() != OrderStatus.DELIVERED) {
+            throw new OrderConflictException("chỉ đơn hàng đã được giao");
         }
 
         order.setStatus(OrderStatus.COMPLETED);
@@ -155,10 +166,22 @@ public class OrderUpdateImpl implements OrderUpdateService {
 
         validateStatusTransition(currentStatus, nextStatus);
         order.setStatus(nextStatus);
+        if (nextStatus == OrderStatus.CANCELLED) {
+            restoreProductQuantity(order);
+        }
         notifyUserWhenAdminUpdatesStatus(order, nextStatus);
     }
 
     // ---PRIVATE---//
+    private void restoreProductQuantity(Order order) {
+        for (OrderItem orderItem : order.getItems()) {
+            itemUpdateService.increase(
+                    orderItem.getId().getProductId(),
+                    orderItem.getId().getSizeId(),
+                    orderItem.getQuantity());
+        }
+    }
+
     private void validateStatusTransition(OrderStatus current, OrderStatus next) {
         boolean valid = switch (current) {
             case UNPAID -> next == OrderStatus.PENDING;

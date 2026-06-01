@@ -96,13 +96,15 @@ public class PromotionImpl implements PromotionService {
         if (newEnd.isBefore(newStart))
             throw new StartIsAfterEnd();
 
-        if (newEnd.isAfter(Instant.now()))
-            throw new EndAtCanNotAfterNow();
+        Instant now = Instant.now();
 
-        if (newStart.isBefore(Instant.now()))
-            promotion.setStatus(PromotionStatus.ACTIVE);
-        else
+        if (newEnd.isBefore(now)) {
+            promotion.setStatus(PromotionStatus.ENDED);
+        } else if (newStart.isAfter(now)) {
             promotion.setStatus(PromotionStatus.SCHEDULED);
+        } else {
+            promotion.setStatus(PromotionStatus.ACTIVE);
+        }
 
         promotion.setStartAt(newStart);
         promotion.setEndAt(newEnd);

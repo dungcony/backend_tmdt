@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.dev.dungcony.modules.order.dtos.OrderDto;
 import com.dev.dungcony.modules.order.dtos.OrderItemDto;
-import com.dev.dungcony.modules.users.services.interfaces.RecieverGetService;
+import com.dev.dungcony.modules.users.services.interfaces.receivers.RecieverGetService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

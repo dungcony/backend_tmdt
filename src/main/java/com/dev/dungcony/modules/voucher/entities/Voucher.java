@@ -50,7 +50,7 @@ public class Voucher extends BaseEntity {
 
     @NotNull
     @Column(name = "value", nullable = false)
-    private Integer value;
+    private BigDecimal value;
 
     @NotNull
     @Column(name = "min_order_amount", nullable = false)
@@ -61,6 +61,9 @@ public class Voucher extends BaseEntity {
 
     @Column(name = "end_at")
     private Instant endAt;
+
+    @Column(name = "rank_id")
+    private Integer rankId;
 
     @Version
     @Column(name = "version", nullable = false)

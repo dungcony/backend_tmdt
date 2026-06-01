@@ -14,6 +14,7 @@ import com.dev.dungcony.modules.product.services.interfaces.item.ItemUpdateServi
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -22,6 +23,7 @@ public class ItemUpdateimpl implements ItemUpdateService {
     private final ItemRepository itemRepository;
     private final SizeCacheService sizeCacheService;
 
+    @Transactional
     @Override
     public ItemRes updateQuantity(ItemUpdateReq req) {
         Item item = get(req.productCode(), sizeCacheService.getIdBySize(req.size()));
@@ -34,9 +36,9 @@ public class ItemUpdateimpl implements ItemUpdateService {
         return ItemMapper.toRes(item);
     }
 
+    @Transactional
     @Override
     public void reduce(int productId, int sizeId, int quantity) {
-
         Item item = get(productId, sizeId);
 
         int newCnt = item.getQuantity() - quantity;
@@ -44,14 +46,12 @@ public class ItemUpdateimpl implements ItemUpdateService {
         if (newCnt < 0)
             throw new ItemQuantityUnLimit();
 
+        item.setQuantity(newCnt);
         if (newCnt == 0)
             item.setStatus(ItemStatus.OUT_OF_STOCK);
-
-        item.setQuantity(newCnt);
-
-        itemRepository.save(item);
     }
 
+    @Transactional
     @Override
     public void increase(int productId, int sizeId, int quantity) {
 
@@ -69,7 +69,7 @@ public class ItemUpdateimpl implements ItemUpdateService {
     // ------------------------------ PRIVATE --------------------------------//
 
     private Item get(int pId, int sId) {
-        return itemRepository.findById(new ItemId(pId, sId))
+        return itemRepository.findByIdForUpdate(new ItemId(pId, sId))
                 .orElseThrow(ItemNotFoundException::new);
     }
 }

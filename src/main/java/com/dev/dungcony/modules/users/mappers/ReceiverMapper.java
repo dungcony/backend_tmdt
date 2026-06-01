@@ -1,19 +1,10 @@
 package com.dev.dungcony.modules.users.mappers;
 
-import com.dev.dungcony.modules.users.dtos.ReceiverDto;
-import com.dev.dungcony.modules.users.dtos.req.ReceiverCreateReq;
-import com.dev.dungcony.modules.users.dtos.res.ReceiverRes;
+import com.dev.dungcony.modules.users.dto.req.ReceiverCreateReq;
+import com.dev.dungcony.modules.users.dto.res.ReceiverRes;
 import com.dev.dungcony.modules.users.entities.Receiver;
 
-public class ReceiverMapper {
-    public static ReceiverDto toDto(Receiver receiver) {
-        return new ReceiverDto(
-                receiver.getId(),
-                AddressMapper.toDto(receiver.getAddress()),
-                receiver.getFirstName(),
-                receiver.getLastName(),
-                receiver.getPhone());
-    }
+public final class ReceiverMapper {
 
     public static ReceiverRes toRes(Receiver receiver) {
         return new ReceiverRes(

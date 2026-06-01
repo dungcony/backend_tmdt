@@ -1,11 +1,12 @@
 package com.dev.dungcony.modules.voucher.services.impl;
 
-import com.dev.dungcony.modules.users.dtos.res.UserRes;
-import com.dev.dungcony.modules.users.services.interfaces.UserGetService;
-import com.dev.dungcony.modules.voucher.dtos.res.UserVoucherRes;
+import com.dev.dungcony.modules.users.dto.res.UserRes;
+import com.dev.dungcony.modules.users.services.interfaces.users.UserGetService;
+import com.dev.dungcony.modules.voucher.dto.res.UserVoucherRes;
 import com.dev.dungcony.modules.voucher.entities.UserVoucher;
 import com.dev.dungcony.modules.voucher.entities.UserVoucherId;
 import com.dev.dungcony.modules.voucher.entities.Voucher;
+import com.dev.dungcony.modules.voucher.enums.DiscountType;
 import com.dev.dungcony.modules.voucher.enums.VoucherType;
 import com.dev.dungcony.modules.voucher.enums.UserVoucherStatus;
 import com.dev.dungcony.modules.voucher.enums.VoucherStatus;
@@ -41,7 +42,9 @@ public class UserVoucherImpl implements UserVoucherCreateService, UserVoucherGet
 
     @Override
     public void applyNewbieVoucher(UUID uid) {
-        log.info("applyNewbieVoucher", uid);
+
+        log.info("apply Newbie Voucher {}", uid);
+
         List<Voucher> vouchers = voucherGetService.getByTypeAndStatus(VoucherType.NEWBIE, VoucherStatus.ACTIVE);
 
         List<UserVoucher> uvs = new ArrayList<>();
@@ -101,14 +104,16 @@ public class UserVoucherImpl implements UserVoucherCreateService, UserVoucherGet
         }
 
         // Áp dụng giảm giá theo phần trăm hoặc số tiền cố định
-        if (userVoucher.getVoucher().getValue() < 100) {
+        if (userVoucher.getVoucher().getDiscountType() == DiscountType.PERCENT) {
             // Giảm giá theo phần trăm
-            BigDecimal discountRate = BigDecimal.valueOf(100 - userVoucher.getVoucher().getValue());
+            BigDecimal discountRate = BigDecimal.valueOf(100).subtract(
+                    userVoucher.getVoucher().getValue());
+
             finalPrice = finalPrice.multiply(discountRate)
                     .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         } else {
             // Giảm giá số tiền cố định
-            finalPrice = finalPrice.subtract(userVoucher.getVoucher().getMinOrderAmount());
+            finalPrice = finalPrice.subtract(userVoucher.getVoucher().getValue());
 
             // Đảm bảo giá cuối cùng không âm
             if (finalPrice.compareTo(BigDecimal.ZERO) < 0) {
@@ -117,7 +122,6 @@ public class UserVoucherImpl implements UserVoucherCreateService, UserVoucherGet
         }
 
         return finalPrice;
-
     }
 
     //--------------------------- UPDATE USER VOUCHER -----------------------//
@@ -166,10 +170,15 @@ public class UserVoucherImpl implements UserVoucherCreateService, UserVoucherGet
     //-------------------------------- PRIVATE -----------------------------//
 
     private UserVoucher getByCode(UUID uid, String code) {
+
         Voucher voucher = voucherGetService.getVoucherByCode(code);
 
-        if (voucher.getVoucherType() != VoucherType.GLOBAL)
+        if (voucher.getVoucherType() == VoucherType.NEWBIE && !userGetService.isNewBie(uid))
             throw new UserVoucherNotAvailable();
+
+        if (voucher.getVoucherType() == VoucherType.USER_RANK && !userGetService.rankIsValid(uid, voucher.getRankId()))
+            throw new UserVoucherNotAvailable();
+
 
         UserVoucherId id = new UserVoucherId(voucher.getId(), uid);
         UserVoucher uv = userVoucherRepository.findById(id).orElse(null);

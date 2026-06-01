@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.dev.dungcony.modules.product.dtos.res.CategoryRes;
 import com.dev.dungcony.modules.product.entities.Category;
+import com.dev.dungcony.modules.product.enums.CategoryStatus;
 import com.dev.dungcony.modules.product.exceptions.CategoryNotFoundException;
 import com.dev.dungcony.modules.product.mappers.CategoryMapper;
 import com.dev.dungcony.modules.product.repositories.CategoryRepository;
@@ -32,6 +33,14 @@ public class CategoryGetServiceImpl implements CategoryGetService {
     @Override
     public List<CategoryRes> getAll() {
         return categoryRepository.findAll()
+                .stream()
+                .map(categoryMapper::toRes)
+                .toList();
+    }
+
+    @Override
+    public List<CategoryRes> getAllLeaf() {
+        return categoryRepository.findAllLeafByStatus(CategoryStatus.ACTIVE)
                 .stream()
                 .map(categoryMapper::toRes)
                 .toList();

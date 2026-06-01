@@ -9,8 +9,8 @@ import com.dev.dungcony.modules.auth.exceptions.IncorrectInput;
 import com.dev.dungcony.modules.auth.enums.Status;
 import com.dev.dungcony.modules.auth.services.interfaces.*;
 import com.dev.dungcony.modules.users.exceptions.UserNotFound;
-import com.dev.dungcony.modules.users.services.interfaces.UserCreateService;
-import com.dev.dungcony.modules.users.services.interfaces.UserGetService;
+import com.dev.dungcony.modules.users.services.interfaces.users.UserCreateService;
+import com.dev.dungcony.modules.users.services.interfaces.users.UserGetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

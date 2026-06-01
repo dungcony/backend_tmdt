@@ -2,9 +2,9 @@ package com.dev.dungcony.modules.voucher.controllers.admin;
 
 
 import com.dev.dungcony.commons.dtos.ApiRes;
-import com.dev.dungcony.modules.voucher.dtos.req.CreateVoucherReq;
-import com.dev.dungcony.modules.voucher.dtos.req.VoucherUpdateReq;
-import com.dev.dungcony.modules.voucher.dtos.res.VoucherRes;
+import com.dev.dungcony.modules.voucher.dto.req.CreateVoucherReq;
+import com.dev.dungcony.modules.voucher.dto.req.VoucherUpdateReq;
+import com.dev.dungcony.modules.voucher.dto.res.VoucherRes;
 import com.dev.dungcony.modules.voucher.services.interfaces.VoucherCreateService;
 import com.dev.dungcony.modules.voucher.services.interfaces.VoucherUpdateService;
 import io.swagger.v3.oas.annotations.tags.Tag;

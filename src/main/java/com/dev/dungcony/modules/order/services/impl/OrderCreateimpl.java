@@ -22,8 +22,9 @@ import com.dev.dungcony.modules.product.dtos.ProductDto;
 import com.dev.dungcony.modules.product.services.interfaces.SizeCacheService;
 import com.dev.dungcony.modules.product.services.interfaces.item.ItemUpdateService;
 import com.dev.dungcony.modules.product.services.interfaces.product.ProductGetService;
-import com.dev.dungcony.modules.users.dtos.res.ReceiverRes;
-import com.dev.dungcony.modules.users.services.interfaces.RecieverGetService;
+import com.dev.dungcony.modules.users.dto.res.ReceiverRes;
+import com.dev.dungcony.modules.users.services.interfaces.receivers.RecieverGetService;
+import com.dev.dungcony.modules.users.services.interfaces.users.UserUpdateService;
 import com.dev.dungcony.modules.voucher.services.interfaces.UserVoucherGetService;
 import com.dev.dungcony.modules.voucher.services.interfaces.UserVoucherUpdateService;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ public class OrderCreateimpl implements OrderCreateService {
     //USER
     private final UserVoucherGetService userVoucherService;
     private final UserVoucherUpdateService userVoucherUpdateService;
+    private final UserUpdateService userUpdateService;
     //CART
     private final CartItemGetService cartItemGetService;
     private final CartUpdateService cartUpdateService;
@@ -94,6 +96,8 @@ public class OrderCreateimpl implements OrderCreateService {
         orderRepo.save(order);
 
 
+        // giảm số lượng sản phẩm
+        reduceProductQuantity(orderItemDetail.cartItemDtos);
         cartUpdateService.consumeListItem(userId, orderItemDetail.cartItemDtos);
         log.info("Order created: {} for user: {}", order.getCode(), userId);
         notificationCreateService.userCreateOrder(userId);
@@ -102,7 +106,7 @@ public class OrderCreateimpl implements OrderCreateService {
         if (req.paymentType() == PaymentType.ONLINE) {
             PaymentRes paymentRes = payOsService.createPaymentUrl(userId, order.getCode(), ipAddress);
             paymentUrl = paymentRes.paymentUrl();
-        }
+        } else userUpdateService.increasePurchaseAndUpdateRank(userId, order.getFinalPrice());
 
         return OrderMapper.toOrderRes(order, orderItemDetail.orderItemDtos, receiver, paymentUrl);
     }
@@ -113,6 +117,13 @@ public class OrderCreateimpl implements OrderCreateService {
     }
 
     // -----------------------------PRIVATE-----------------------------------//
+
+    private void reduceProductQuantity(List<CartItemConsumeDto> cartItemDtos) {
+        for (CartItemConsumeDto cartItemDto : cartItemDtos) {
+            int sizeId = sizeCacheService.getIdBySize(cartItemDto.productSize());
+            itemUpdateService.reduce(cartItemDto.productId(), sizeId, cartItemDto.quantity());
+        }
+    }
 
     // kiểm tra lại dữ liệu với dữ liệu client gửi lên
     private void validateClientTotals(
@@ -130,8 +141,7 @@ public class OrderCreateimpl implements OrderCreateService {
             throw new OrderConflictException("Order final price has changed");
     }
 
-    // ----------------------------------------------- INNER CLASS
-    // ------------------------------------//
+    // ----------------------------------------------- INNER CLASS ------------------------------------//
     private class OrderItemDetail {
         List<OrderItemDto> orderItemDtos;
         BigDecimal totalPrice;
