@@ -70,3 +70,10 @@ jwt:
 app:
   email:
     sendgrid-api-key: ${SENDGRID_API_KEY:}
+
+cloudinary:
+  cloud-name: ${CLOUDINARY_NAME:}
+  api-key: ${CLOUDINARY_API_KEY:}
+  api-secret: ${CLOUDINARY_API_SECRET:}
+  folder: ${CLOUDINARY_FOLDER:}
+  max-file-size-bytes: ${CLOUDINARY_MAX_FILE_SIZE_BYTES:}
