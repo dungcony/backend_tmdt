@@ -303,12 +303,13 @@ create table tbl_users
     acc_id             integer
         constraint tbl_users_tbl_accounts__fk
             references tbl_accounts
-            on delete cascade,
+            on delete cascade
+        unique,
     created_at         timestamp with time zone default CURRENT_TIMESTAMP,
     updated_at         timestamp with time zone default CURRENT_TIMESTAMP,
     last_purchase_time timestamp with time zone,
     toltal_purchase    numeric(38, 2)           default 0,
-    rank_id            integer
+    rank_id            integer                  not null
         constraint tbl_users_tbl_ranks__fk
             references tbl_ranks
             on delete cascade

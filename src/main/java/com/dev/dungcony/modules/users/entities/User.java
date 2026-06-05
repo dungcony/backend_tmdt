@@ -54,7 +54,7 @@ public class User extends BaseEntity implements Persistable<UUID> {
     @Column(name = "toltal_purchase", nullable = false)
     private BigDecimal toltalPurchase = BigDecimal.ZERO;
     
-    @Column(name = "acc_id")
+    @Column(name = "acc_id", unique = true)
     private Integer accountId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

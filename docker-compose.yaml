@@ -18,7 +18,6 @@ services:
       SPRING_DATA_REDIS_PORT: ${SPRING_DATA_REDIS_PORT:-6379}
       SPRING_DATA_REDIS_PASSWORD: ${SPRING_DATA_REDIS_PASSWORD:-}
 
-      # 🔥 Quan trọng: lấy từ Railway / ENV ngoài
       JWT_SECRET: ${JWT_SECRET:-local-docker-jwt-secret-change-me-32chars}
 
       MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
